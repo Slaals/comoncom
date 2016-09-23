@@ -39,10 +39,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   parser.href = tab.url;
 
   var videoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
-
   if(typeof videoId !== 'undefined' && changeInfo.status == 'complete') {
     requestComs(videoId).then(function(res) {
-      chrome.tabs.sendMessage(tabId, { coms: res.result.items }, function(response) {});
+      chrome.tabs.sendMessage(tabId, { coms: res.result.items });
     }, function(err) {
       console.log('Error when requesting coms:', err);
     });

@@ -1,6 +1,7 @@
 'use strict';
 
 var watcher;
+var showTimer;
 var toShow = [];
 
 function fetchCT(callback) {
@@ -19,18 +20,24 @@ function fetchCT(callback) {
 }
 
 function show(com, elt) {
-  stopWatching();
+  window.clearTimeout(showTimer);
 
   var comSpace = document.getElementsByClassName('coc-com')[0];
 
   document.getElementsByClassName('coc-profile')[0].src = com.profile;
-  document.getElementsByClassName('coc-author')[0].innerHTML = com.author;
+  document.getElementsByClassName('coc-author')[0].innerHTML = com.author + '<br/>';
   document.getElementsByClassName('coc-text')[0].innerHTML = com.text;
 
   comSpace.className = 'coc-com coc-show';
-
   window.setTimeout(function() {
-    comSpace.className = 'coc-com coc-hide';
+    comSpace.style.opacity = '1';
+  }, 100);
+
+  showTimer = window.setTimeout(function() {
+    comSpace.style.opacity = '0';
+    window.setTimeout(function() {
+      comSpace.className = 'coc-com coc-hide';
+    }, 100);
     startWatching(elt);
   }, 5000);
 }
@@ -39,10 +46,6 @@ function startWatching(elt) {
   watcher = window.setInterval(function() {
     if(typeof toShow[elt.value] !== 'undefined') show(toShow[elt.value], elt);
   }, 250);
-}
-
-function stopWatching() {
-  window.clearInterval(watcher);
 }
 
 function clean() {
@@ -54,6 +57,8 @@ function clean() {
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   clean();
+
+  console.log('toto', message);
 
   var player = document.getElementById('player-api');
 
@@ -90,17 +95,22 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     var profileElt = document.createElement('img');
     profileElt.setAttribute('class', 'coc-profile');
 
-    var authorElt = document.createElement('div');
+    var authorElt = document.createElement('span');
     authorElt.setAttribute('class', 'coc-author');
 
-    var textElt = document.createElement('div');
+    var textBlockElt = document.createElement('div');
+    textBlockElt.setAttribute('class', 'coc-text-block');
+
+    var textElt = document.createElement('p');
     textElt.setAttribute('class', 'coc-text');
 
     infoBlock.appendChild(profileElt);
-    infoBlock.appendChild(authorElt);
+
+    textBlockElt.appendChild(authorElt);
+    textBlockElt.appendChild(textElt);
 
     comSpace.appendChild(infoBlock);
-    comSpace.appendChild(textElt);
+    comSpace.appendChild(textBlockElt );
 
     player.appendChild(comSpace);
 
