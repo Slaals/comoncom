@@ -36,17 +36,43 @@ function requestComs(id) {
   return req;
 }
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  var parser = document.createElement('a');
-  parser.href = tab.url;
+chrome.browserAction.onClicked.addListener(function() {
+  chrome.storage.sync.get({
+    isEnabled: true
+  }, function(items) {
+    if(items.isEnabled) {
+      chrome.storage.sync.set({
+        isEnabled: false
+      }, function() {
+        chrome.browserAction.setIcon({path: "comon_off.png"});
+      });
+    } else {
+      chrome.storage.sync.set({
+        isEnabled: true
+      }, function() {
+        chrome.browserAction.setIcon({path: "comon_on.png"});
+      });
+    }
+  });
+});
 
-  var curVideoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
-  if(typeof curVideoId !== 'undefined' && changeInfo.status == 'complete' && curVideoId != videoId) {
-    requestComs(curVideoId).then(function(res) {
-      videoId = curVideoId;
-      chrome.tabs.sendMessage(tabId, { coms: res.result.items });
-    }, function(err) {
-      console.log('Error when requesting coms:', err);
-    });
-  }
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  chrome.storage.sync.get({
+    isEnabled: true
+  }, function(items) {
+    if(!items.isEnabled) return;
+    var parser = document.createElement('a');
+    parser.href = tab.url;
+
+    var curVideoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
+    if(typeof curVideoId !== 'undefined' && changeInfo.status == 'complete' && curVideoId != videoId) {
+      requestComs(curVideoId).then(function(res) {
+        videoId = curVideoId;
+        chrome.tabs.sendMessage(tabId, { coms: res.result.items });
+      }, function(err) {
+        console.log('Error when requesting coms:', err);
+      });
+    }
+  });
 });

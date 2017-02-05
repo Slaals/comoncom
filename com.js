@@ -83,8 +83,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     }
   }
 
-  console.log(toShow);
-
   fetchCT(function(elt) {
     var comSpace = document.createElement('div');
     comSpace.setAttribute('class', 'coc-com coc-hide');
