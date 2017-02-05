@@ -58,8 +58,6 @@ function clean() {
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   clean();
 
-  console.log('toto', message);
-
   var player = document.getElementById('player-api');
 
   var timeP = /[\d]{1,2}:[\d]{1,2}/;
@@ -84,6 +82,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       toShow[sKey].profile = aProfile;
     }
   }
+
+  console.log(toShow);
 
   fetchCT(function(elt) {
     var comSpace = document.createElement('div');

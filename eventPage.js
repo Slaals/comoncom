@@ -1,5 +1,7 @@
 'use strict';
 
+var videoId;
+
 (function() {
   if(typeof gapi !== 'undefined') return;
 
@@ -17,7 +19,7 @@ function initGapi() {
   gapi.client.setApiKey(key);
 }
 
-function requestComs(videoId) {
+function requestComs(id) {
   function getResponse(res) {
     var mess;
     if(res.code && res.data[0].debugInfo == 'QuotaState: BLOCKED') {
@@ -28,7 +30,7 @@ function requestComs(videoId) {
   }
   var req = gapi.client.request({
     'path': 'https://www.googleapis.com/youtube/v3/commentThreads',
-    'params': { 'part': 'snippet', 'videoId': videoId, 'maxResults': 100 }
+    'params': { 'part': 'snippet', 'videoId': id, 'maxResults': 100 }
   });
 
   return req;
@@ -38,9 +40,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   var parser = document.createElement('a');
   parser.href = tab.url;
 
-  var videoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
-  if(typeof videoId !== 'undefined' && changeInfo.status == 'complete') {
-    requestComs(videoId).then(function(res) {
+  var curVideoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
+  if(typeof curVideoId !== 'undefined' && changeInfo.status == 'complete' && curVideoId != videoId) {
+    requestComs(curVideoId).then(function(res) {
+      videoId = curVideoId;
       chrome.tabs.sendMessage(tabId, { coms: res.result.items });
     }, function(err) {
       console.log('Error when requesting coms:', err);
