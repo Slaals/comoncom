@@ -82,6 +82,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       toShow[sKey].profile = aProfile;
     }
   }
+  console.log(toShow);
 
   fetchCT(function(elt) {
     var comSpace = document.createElement('div');

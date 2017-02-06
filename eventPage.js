@@ -61,12 +61,13 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   chrome.storage.sync.get({
     isEnabled: true
   }, function(items) {
-    if(!items.isEnabled) return;
+    if(!items.isEnabled || changeInfo.status !== 'complete') return;
     var parser = document.createElement('a');
     parser.href = tab.url;
 
     var curVideoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
-    if(typeof curVideoId !== 'undefined' && changeInfo.status == 'complete' && curVideoId != videoId) {
+    if(typeof curVideoId !== 'undefined' && curVideoId != videoId) {
+      console.log('request', curVideoId);
       requestComs(curVideoId).then(function(res) {
         videoId = curVideoId;
         chrome.tabs.sendMessage(tabId, { coms: res.result.items });
