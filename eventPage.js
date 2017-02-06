@@ -67,7 +67,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
     var curVideoId = (typeof parser.search !== 'undefined') ? parser.search.split('=')[1] : undefined;
     if(typeof curVideoId !== 'undefined' && curVideoId != videoId) {
-      console.log('request', curVideoId);
+      curVideoId = curVideoId.split('&')[0];
       requestComs(curVideoId).then(function(res) {
         videoId = curVideoId;
         chrome.tabs.sendMessage(tabId, { coms: res.result.items });

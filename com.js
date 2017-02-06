@@ -49,10 +49,20 @@ function startWatching(elt) {
 }
 
 function clean() {
+  Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+  }
+  NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+      if(this[i] && this[i].parentElement) {
+        this[i].parentElement.removeChild(this[i]);
+      }
+    }
+  }
   window.clearInterval(watcher);
   toShow = [];
-  var comSpace = document.getElementsByClassName('coc-com')[0];
-  if(typeof comSpace !== 'undefined') comSpace.className = 'coc-com coc-hide';
+  var comSpace = document.getElementsByClassName('coc-com');
+  if(typeof comSpace !== 'undefined') comSpace.remove();
 }
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -82,7 +92,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       toShow[sKey].profile = aProfile;
     }
   }
-  console.log(toShow);
 
   fetchCT(function(elt) {
     var comSpace = document.createElement('div');
