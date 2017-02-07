@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       var sKey = timeP.exec(text)[0];
 
       var sKeys = sKey.split(':');
-      if(sKeys[0].length === 2 && sKeys[0].charAt(0) === '0') sKeys[0] = sKeys[0].slice(0, 1);
+      if(sKeys[0].length === 2 && sKeys[0].charAt(0) === '0') sKeys[0] = sKeys[0].slice(1);
       sKey = sKeys.join(':');
 
       toShow[sKey] = {};
